@@ -54,7 +54,91 @@ type Session struct {
 	Values Values       // values of the session
 }
 
-type Values map[string]interface {
+// convenience function to add a "flash message" to this session - uses the key "_flashes"
+func (s *Session) AddFlash(v interface{}) {
+	flashes := []interface{}{}
+	// extract existing flash messages
+	f := s.Values["_flashes"]
+	if f != nil {
+		if f1, ok := f.([]interface{}); ok {
+			flashes = f1
+		}
+	}
+	// append this one
+	flashes = append(flashes, v)
+	// set it back
+	s.Values["_flashes"] = flashes
+}
+
+// pops the "flash messages" from this session
+func (s *Session) Flashes() []interface{} {
+	f := s.Values["_flashes"]
+	if f != nil {
+		if f1, ok := f.([]interface{}); ok {
+			delete(s.Values, "_flashes")
+			return f1
+		}
+	}
+	return nil
+}
+
+type Values map[string]interface{}
+
+func (v Values) GetString(key string) string {
+	val, ok := v[key]
+	if !ok {
+		return ""
+	}
+	ret, ok := val.(string)
+	if !ok {
+		return ""
+	}
+	return ret
+}
+func (v Values) SetString(key string, val string) {
+	v[key] = val
+}
+func (v Values) GetInt64(key string) int64 {
+	val, ok := v[key]
+	if !ok {
+		return 0
+	}
+	ret, ok := val.(int64)
+	if !ok {
+		return 0
+	}
+	return ret
+}
+func (v Values) SetInt64(key string, val int64) {
+	v[key] = val
+}
+func (v Values) GetFloat64(key string) float64 {
+	val, ok := v[key]
+	if !ok {
+		return 0
+	}
+	ret, ok := val.(float64)
+	if !ok {
+		return 0
+	}
+	return ret
+}
+func (v Values) SetFloat64(key string, val float64) {
+	v[key] = val
+}
+func (v Values) GetBool(key string) bool {
+	val, ok := v[key]
+	if !ok {
+		return false
+	}
+	ret, ok := val.(bool)
+	if !ok {
+		return false
+	}
+	return ret
+}
+func (v Values) SetBool(key string, val bool) {
+	v[key] = val
 }
 
 // TODO: make a way to delete a session and recreate it with a new id - to prevent
